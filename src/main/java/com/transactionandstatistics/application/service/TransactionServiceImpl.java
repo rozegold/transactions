@@ -33,7 +33,7 @@ public class TransactionServiceImpl implements TransactionService {
 
         double amount = transaction.getAmount();
 
-        synchronized (Collections.synchronizedMap(transactionMap)) {
+        synchronized (this) {
             if (transactionMap.containsKey(transaction.getTimestamp())) {
                 updateStatistics(transaction);
             } else {
@@ -47,7 +47,7 @@ public class TransactionServiceImpl implements TransactionService {
     public Statistics retrieveStatistics() {
         if (isTransactionEmpty())
             return new Statistics();
-        synchronized (Collections.synchronizedMap(transactionMap)) {
+        synchronized (this) {
             return new Statistics(getSum(), getMax(), getMin(), getCount(), getAvg());
         }
     }
