@@ -13,10 +13,6 @@ public class Transaction {
         this.timestamp = timestamp;
     }
 
-    public void setTimestamp(long timestamp) {
-        this.timestamp = timestamp;
-    }
-
     public double getAmount() {
         return amount;
     }

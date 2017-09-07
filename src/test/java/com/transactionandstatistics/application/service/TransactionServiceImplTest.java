@@ -8,7 +8,6 @@ import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.springframework.http.HttpStatus;
 
-import java.awt.*;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
@@ -104,9 +103,9 @@ public class TransactionServiceImplTest {
     }
 
     @Test
-    public void shouldRejectTransactionsOlderThanSpecifiedTime(){
-        assertEquals(HttpStatus.NO_CONTENT,subject.performTransaction(oldTransaction));
-        assertEquals(HttpStatus.NO_CONTENT,subject.performTransaction(null));
+    public void shouldRejectTransactionsOlderThanSpecifiedTime() {
+        assertEquals(HttpStatus.NO_CONTENT, subject.performTransaction(oldTransaction));
+        assertEquals(HttpStatus.NO_CONTENT, subject.performTransaction(null));
     }
 
     @Test

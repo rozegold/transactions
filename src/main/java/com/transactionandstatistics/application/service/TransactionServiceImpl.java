@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
 @Component
 public class TransactionServiceImpl implements TransactionService {
 
-    public static final int DURATION = 60;
+    private static final int DURATION = 60;
     private Map<Long, Statistics> transactionMap;
 
     public TransactionServiceImpl() {
@@ -49,23 +49,21 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     private boolean isTransactionEmpty() {
-        if (null == transactionMap || transactionMap.isEmpty())
-            return true;
-        return false;
+        return (null == transactionMap || transactionMap.isEmpty());
     }
 
     private void updateStatistics(Transaction transaction) {
-        double amount = transaction.getAmount();
         Statistics statistics = transactionMap.get(transaction.getTimestamp());
+
+        double amount = transaction.getAmount();
+        double currMin = statistics.getMin();
+        double currMax = statistics.getMax();
+
         statistics.setSum(statistics.getSum() + amount);
         statistics.setCount(statistics.getCount() + 1);
         statistics.setAvg(statistics.getSum() / statistics.getCount());
-        if (statistics.getMax() < amount) {
-            statistics.setMax(amount);
-        }
-        if (statistics.getMin() > amount) {
-            statistics.setMin(amount);
-        }
+        statistics.setMax(currMax < amount ? amount : currMax);
+        statistics.setMin(currMin > amount ? amount : currMin);
 
         transactionMap.put(transaction.getTimestamp(), statistics);
     }
