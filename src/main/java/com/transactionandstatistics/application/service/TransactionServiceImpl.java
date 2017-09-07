@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -31,7 +32,8 @@ public class TransactionServiceImpl implements TransactionService {
             return HttpStatus.NO_CONTENT;
 
         double amount = transaction.getAmount();
-        synchronized (this) {
+
+        synchronized (Collections.synchronizedMap(transactionMap)) {
             if (transactionMap.containsKey(transaction.getTimestamp())) {
                 updateStatistics(transaction);
             } else {
@@ -45,7 +47,9 @@ public class TransactionServiceImpl implements TransactionService {
     public Statistics retrieveStatistics() {
         if (isTransactionEmpty())
             return new Statistics();
-        return new Statistics(getSum(), getMax(), getMin(), getCount(), getAvg());
+        synchronized (Collections.synchronizedMap(transactionMap)) {
+            return new Statistics(getSum(), getMax(), getMin(), getCount(), getAvg());
+        }
     }
 
     private boolean isTransactionEmpty() {
