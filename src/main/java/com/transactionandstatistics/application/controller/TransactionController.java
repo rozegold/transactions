@@ -21,7 +21,6 @@ public class TransactionController {
     @RequestMapping(path = "/transaction", method = RequestMethod.POST)
     public @ResponseStatus
     HttpStatus transaction(@RequestBody Transaction transaction) {
-        transaction.setTimestamp(Instant.now().toEpochMilli());
         return service.performTransaction(transaction);
     }
 

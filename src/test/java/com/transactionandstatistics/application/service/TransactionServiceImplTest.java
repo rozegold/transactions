@@ -6,7 +6,9 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
+import org.springframework.http.HttpStatus;
 
+import java.awt.*;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
@@ -21,10 +23,12 @@ public class TransactionServiceImplTest {
     private Instant now = Instant.now();
     private long timestamp = now.toEpochMilli();
     private long timeStampSecond = now.plus(1000, ChronoUnit.MILLIS).toEpochMilli();
+    private long timeStampOld = now.minus(2, ChronoUnit.MINUTES).toEpochMilli();
     private double delta = 0.01;
     private Transaction firstTransaction = new Transaction(20, timestamp);
     private Transaction secondTransaction = new Transaction(40, timestamp);
     private Transaction thirdTransaction = new Transaction(60, timeStampSecond);
+    private Transaction oldTransaction = new Transaction(60, timeStampOld);
 
     @Before
     public void setup() {
@@ -97,6 +101,22 @@ public class TransactionServiceImplTest {
         assertEquals(40, statistics.getAvg(), delta);
         assertEquals(60, statistics.getMax(), delta);
         assertEquals(20, statistics.getMin(), delta);
+    }
+
+    @Test
+    public void shouldRejectTransactionsOlderThanSpecifiedTime(){
+        assertEquals(HttpStatus.NO_CONTENT,subject.performTransaction(oldTransaction));
+        assertEquals(HttpStatus.NO_CONTENT,subject.performTransaction(null));
+    }
+
+    @Test
+    public void shouldExpireOlderTransactions() throws InterruptedException {
+        subject = new TransactionServiceImpl(1);
+        subject.performTransaction(firstTransaction);
+        assertEquals(1, subject.retrieveStatistics().getCount());
+        Thread.sleep(1000);
+        assertEquals(0, subject.retrieveStatistics().getCount());
+
     }
 
 }

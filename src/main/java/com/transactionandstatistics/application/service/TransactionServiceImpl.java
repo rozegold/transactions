@@ -6,22 +6,28 @@ import org.apache.commons.collections4.map.PassiveExpiringMap;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 @Component
 public class TransactionServiceImpl implements TransactionService {
 
+    public static final int DURATION = 60;
     private Map<Long, Statistics> transactionMap;
 
     public TransactionServiceImpl() {
-        this.transactionMap = new PassiveExpiringMap<>(60, TimeUnit.SECONDS);
+        this.transactionMap = new PassiveExpiringMap<>(DURATION, TimeUnit.SECONDS);
     }
 
+    public TransactionServiceImpl(int duration) {
+        this.transactionMap = new PassiveExpiringMap<>(duration, TimeUnit.SECONDS);
+    }
 
     @Override
     public HttpStatus performTransaction(Transaction transaction) {
-        if (null == transaction || transaction.getTimestamp() < System.currentTimeMillis() - 60000)
+        if (null == transaction || transaction.getTimestamp() < Instant.now().minus(DURATION, ChronoUnit.SECONDS).toEpochMilli())
             return HttpStatus.NO_CONTENT;
 
         double amount = transaction.getAmount();
