@@ -92,48 +92,23 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     double getSum() {
-        double sum = 0;
-
-        for (Statistics statistics : transactionMap.values()) {
-            sum += statistics.getSum();
-        }
-        return sum;
+        return transactionMap.values().stream().mapToDouble(Statistics::getSum).sum();
     }
 
     double getAvg() {
-        long count = getCount();
-        if (0 == count)
-            return 0;
-        return getSum() / count;
+        return getSum() / getCount();
     }
 
     long getCount() {
-        long count = 0;
-        for (Statistics statistics : transactionMap.values()) {
-            count += statistics.getCount();
-        }
-        return count;
+        return transactionMap.values().stream().mapToLong(Statistics::getCount).sum();
     }
 
 
     double getMax() {
-        double max = Integer.MIN_VALUE;
-
-        for (Statistics statistics : transactionMap.values()) {
-            if (max < statistics.getMax()) {
-                max = statistics.getMax();
-            }
-        }
-        return max;
+        return transactionMap.values().stream().mapToDouble(Statistics::getMax).max().getAsDouble();
     }
 
     double getMin() {
-        double min = Integer.MAX_VALUE;
-        for (Statistics statistics : transactionMap.values()) {
-            if (min > statistics.getMin()) {
-                min = statistics.getMin();
-            }
-        }
-        return min;
+        return transactionMap.values().stream().mapToDouble(Statistics::getMin).min().getAsDouble();
     }
 }
